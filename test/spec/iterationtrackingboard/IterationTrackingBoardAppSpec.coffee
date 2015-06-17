@@ -412,10 +412,8 @@ describe 'Rally.apps.iterationtrackingboard.IterationTrackingBoardApp', ->
         expect(@getPlugin().inline).toBe false
 
   describe 'shared view plugin', ->
-    beforeEach ->
-      @stubFeatureToggle ['F6028_ISP_SHARED_VIEWS'], true
-
     it 'should use rallygridboard shared view plugin', ->
+      @stubFeatureToggle ['F6028_ISP_SHARED_VIEWS'], true
       @createApp().then =>
         gridBoard = @app.down 'rallygridboard'
         plugin = _.find gridBoard.plugins, (plugin) ->
@@ -424,6 +422,24 @@ describe 'Rally.apps.iterationtrackingboard.IterationTrackingBoardApp', ->
         expect(plugin.sharedViewConfig.stateful).toBe true
         expect(plugin.sharedViewConfig.stateId).toBe @app.getContext().getScopedStateId('iteration-tracking-shared-view')
         expect(plugin.sharedViewConfig.defaultViews).toBeDefined()
+
+    it 'should enableGridEditing when S91174_ISP_SHARED_VIEWS_MAKE_PREFERENCE_NAMES_UPDATABLE is true', ->
+      @stubFeatureToggle ['F6028_ISP_SHARED_VIEWS', 'S91174_ISP_SHARED_VIEWS_MAKE_PREFERENCE_NAMES_UPDATABLE'], true
+      @createApp().then =>
+        gridBoard = @app.down 'rallygridboard'
+        plugin = _.find gridBoard.plugins, (plugin) ->
+          plugin.ptype == 'rallygridboardsharedviewcontrol'
+        expect(plugin.enableGridEditing).toBe true
+
+    it 'should NOT enableGridEditing when S91174_ISP_SHARED_VIEWS_MAKE_PREFERENCE_NAMES_UPDATABLE is false', ->
+      isFeatureEnabledStub = @stub(Rally.app.Context.prototype, 'isFeatureEnabled')
+      isFeatureEnabledStub.withArgs('F6028_ISP_SHARED_VIEWS').returns true
+      isFeatureEnabledStub.withArgs('S91174_ISP_SHARED_VIEWS_MAKE_PREFERENCE_NAMES_UPDATABLE').returns false
+      @createApp().then =>
+        gridBoard = @app.down 'rallygridboard'
+        plugin = _.find gridBoard.plugins, (plugin) ->
+          plugin.ptype == 'rallygridboardsharedviewcontrol'
+        expect(plugin.enableGridEditing).toBe false
 
   describe 'page sizes', ->
     beforeEach ->

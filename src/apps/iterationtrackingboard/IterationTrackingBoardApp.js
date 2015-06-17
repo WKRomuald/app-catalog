@@ -476,6 +476,7 @@
         _getSharedViewConfig: function() {
             return {
                 ptype: 'rallygridboardsharedviewcontrol',
+                enableGridEditing: this.getContext().isFeatureEnabled('S91174_ISP_SHARED_VIEWS_MAKE_PREFERENCE_NAMES_UPDATABLE'),
                 sharedViewConfig: {
                     stateful: true,
                     stateId: this.getContext().getScopedStateId('iteration-tracking-shared-view'),
